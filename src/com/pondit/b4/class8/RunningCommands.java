@@ -15,6 +15,7 @@ public class RunningCommands {
             String s = "";
             while ((s = bufferedReader.readLine()) != null) {
                 System.out.println(s);
+
             }
         }
     }
