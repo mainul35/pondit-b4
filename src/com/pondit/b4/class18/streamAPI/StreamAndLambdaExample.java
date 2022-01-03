@@ -1,8 +1,6 @@
-package com.pondit.b4.class18;
+package com.pondit.b4.class18.streamAPI;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class StreamAndLambdaExample {
     public static void main(String[] args) {
