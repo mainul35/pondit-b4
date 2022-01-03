@@ -5,7 +5,9 @@ import java.util.*;
 public class SetExample {
 
     public static void main(String[] args) {
-        Set<String> set = new LinkedHashSet<>();
+        Set<String> set = new HashSet<>();
+//        Set<String> set = new LinkedHashSet<>();
+//        Set<String> set = new TreeSet<>();
 
         set.add("Al Amin");
         set.add("tanveer");
