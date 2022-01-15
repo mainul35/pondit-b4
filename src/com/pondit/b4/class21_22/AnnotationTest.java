@@ -1,9 +1,7 @@
-package com.pondit.b4.class21;
+package com.pondit.b4.class21_22;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 public class AnnotationTest {
 
