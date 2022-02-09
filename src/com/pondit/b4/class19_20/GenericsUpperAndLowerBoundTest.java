@@ -19,7 +19,11 @@ class GenericsUpperBoundTest <T extends Daughter>{
 
         upperBoundTest.list.add(daughter);
         upperBoundTest.list.add(grandChild2);
-        // followings are out of upper bound reach
+
+        // This will work
+        List<? extends GrandPa> childrenOfGrandPa = List.of(new GrandPa(), new Daughter(), new GrandChild2());
+
+        // Howfollowings are out of upper bound reach
 //        upperBoundTest.list.add(grandPa);
 //        upperBoundTest.list.add(son);
 //        upperBoundTest.list.add(grandChild1);
