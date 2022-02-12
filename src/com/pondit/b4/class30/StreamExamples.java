@@ -1,9 +1,6 @@
 package com.pondit.b4.class30;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
@@ -34,14 +31,24 @@ public class StreamExamples {
         System.out.println(lowCaloricDishesName);
         // After
 
-        lowCaloricDishesName =
+        var dishes =
                 menu.stream()
                         .filter(d -> d.getCalories() < 400)
-                        .sorted(comparing(Dish::getCalories).reversed().thenComparing(Dish::getName))
-                        .map(Dish::getName)
+                        // first sort by calories.
+                        // Then reverse to descending order.
+                        // If more than one dish have same calories, then sort by name.
+                        .sorted(comparing(Dish::getCalories).thenComparing(Dish::getName))
+                        .map(StreamExamples::getOnlyNameAndCalories)
                         .collect(toList());
 
-        System.err.println(lowCaloricDishesName);
+        System.err.println(dishes);
+    }
+
+    private static HashMap<String, Object> getOnlyNameAndCalories(Dish dish) {
+        var map = new HashMap<String, Object>();
+        map.put("name", dish.getName());
+        map.put("calories", dish.getCalories());
+        return map;
     }
 
     private static void init(List<Dish> menu) {
@@ -85,6 +92,15 @@ public class StreamExamples {
 class Dish {
     private String name;
     private int calories;
+    private String foodType;
+
+    public String getFoodType() {
+        return foodType;
+    }
+
+    public void setFoodType(String foodType) {
+        this.foodType = foodType;
+    }
 
     public String getName() {
         return name;
@@ -100,5 +116,13 @@ class Dish {
 
     public void setCalories(int calories) {
         this.calories = calories;
+    }
+
+    @Override
+    public String toString() {
+        return "Dish{" +
+                "name='" + name + '\'' +
+                ", calories=" + calories +
+                '}';
     }
 }

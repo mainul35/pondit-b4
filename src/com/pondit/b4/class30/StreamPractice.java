@@ -21,6 +21,22 @@ public class StreamPractice {
         // 1. Find out 3 products with maximum ratings.
         // Sort products by (i) product ratings. If 2 products have same amount of ratings, (ii) sort by names
 
+        System.out.println("============ Testing map()  ==============");
+        customer1
+                .getOrders().stream()
+                .map(Order::getItems)
+                .forEach(System.out::println);
+
+        System.out.println("============ Testing flatMap() ==============");
+
+        customer1
+                .getOrders().stream()
+                .map(Order::getItems)
+                .flatMap(Collection::stream)
+                .forEach(System.out::println);
+
+
+
         var setOfProduct = customer1
                 .getOrders().stream()
                 .map(Order::getItems).flatMap(Collection::stream).collect(Collectors.toSet());
