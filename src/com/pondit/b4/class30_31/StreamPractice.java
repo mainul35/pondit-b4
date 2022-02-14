@@ -5,43 +5,45 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.mapping;
+
 // 1. Find out 3 products with maximum ratings. Sort products by (i) product ratings. If more than 1 products have same amount of ratings, (ii) sort by names
 // 2. Find out 3 products with minimum ratings. Sort products by (i) product ratings. If more than 1 products have same amount of ratings, (ii) sort by names
 // 3. Find out total orders of each specific kind of product
 // 4. Find out customer 1's favorite product. A favorite product is the maximum quantity a customer ordered of a specific product
+// 5. Calculate the total cost of a order for a customer (Customer 1, 2nd order)
+// 6. Find out all books written by each author
 
 public class StreamPractice {
 
     static Customer customer1 = new Customer();
     static Customer customer2 = new Customer();
+    static List<Product> products = new ArrayList<>();
 
     public static void main(String[] args) {
         init();
+//        System.out.println("============ Testing map()  ==============");
+//        customer1
+//                .getOrders().stream()
+//                .map(Order::getItems)
+//                .forEach(System.out::println);
+//
+//        System.out.println("============ Testing flatMap() ==============");
+//
+//        customer1
+//                .getOrders().stream()
+//                .map(Order::getItems)
+//                .flatMap(Collection::stream)
+//                .forEach(System.out::println);
 
-        // 1. Find out 3 products with maximum ratings.
-        // Sort products by (i) product ratings. If 2 products have same amount of ratings, (ii) sort by names
-
-        System.out.println("============ Testing map()  ==============");
-        customer1
-                .getOrders().stream()
-                .map(Order::getItems)
-                .forEach(System.out::println);
-
-        System.out.println("============ Testing flatMap() ==============");
-
-        customer1
-                .getOrders().stream()
-                .map(Order::getItems)
-                .flatMap(Collection::stream)
-                .forEach(System.out::println);
-
-
+        // TODO: 1. Find out 3 products with maximum ratings.
+        //  Sort products by (i) product ratings. If 2 products have same amount of ratings, (ii) sort by names
 
         var setOfProduct = customer1
                 .getOrders().stream()
                 .map(Order::getItems).flatMap(Collection::stream).collect(Collectors.toSet());
 
-        System.out.println("=========== Products with Maximum ratings ============");
+        System.out.println("\n=========== Products with Maximum ratings ============");
         setOfProduct.stream()
                 .sorted(
                         Comparator.comparing(Product::getRating)
@@ -51,10 +53,10 @@ public class StreamPractice {
                 .limit(3)
                 .forEach(System.out::println);
 
-        // 2. Find out 3 products with minimum ratings.
-        // Sort products by (i) product ratings. If 2 products have same amount of ratings, sort by names
+        // TODO: 2. Find out 3 products with minimum ratings.
+        //  Sort products by (i) product ratings. If 2 products have same amount of ratings, sort by names
 
-        System.out.println("=========== Products with Minimum ratings ============");
+        System.out.println("\n=========== Products with Minimum ratings ============");
         setOfProduct.stream()
                 .sorted(
                         Comparator.comparing(Product::getRating)
@@ -63,34 +65,44 @@ public class StreamPractice {
                 .limit(3)
                 .forEach(System.out::println);
 
-        // 3. Find out total orders of each specific kind of product
+        // TODO: 3. Find out total orders of each specific kind of product
         var customer1Orders = customer1.getOrders().stream()
                 .flatMap(order -> order.getItems().stream()).toList();
         var customer2Orders = customer2.getOrders().stream()
                 .flatMap(order -> order.getItems().stream()).toList();
 
-//        System.out.println("============== Testing merged lists =============");
+//        System.out.println("\n============== Testing merged streams =============");
 //        Stream.concat(customer1Orders.stream(), customer2Orders.stream()).forEach(System.out::println);
 
-        System.out.println("============== Find out total orders of each specific kind of product =============");
+        System.out.println("\n============== Find out total orders of each specific kind of product =============");
         Stream.concat(customer1Orders.stream(), customer2Orders.stream())
                 .collect(Collectors.groupingBy(Product::getName, Collectors.counting()))
                 .entrySet().forEach(System.out::println);
 
-        // 4. Find out customer 1's favorite product. A favorite product is the maximum quantity a customer ordered of a specific product
-        System.out.println("============== Customer's favorite product =============");
+        // TODO: 4. Find out customer 1's favorite product.
+        //  A favorite product is the maximum quantity a customer ordered of a specific product
+        System.out.println("\n============== Customer 1's favorite product =============");
         var productsMap = customer1Orders.stream()
                 .collect(Collectors.groupingBy(Product::getName, TreeMap::new, Collectors.counting()));
-
         productsMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .forEach(System.out::println);
-//                .findFirst().ifPresent(System.out::println);
-//        productsMap.entrySet().stream()
-//                .map(StreamPractice::getFavoriteProduct)
-//                .max(Comparator.comparing(FavoriteProduct::getProductCount))
-//                .ifPresent(System.out::println);
 
+        // TODO: 5. Calculate the total cost of a order for a customer (customer 1, 2nd order)
+        System.out.println("\n============= Calculate the total cost of a order for a customer =============");
+        var total = customer1.getOrders().get(0)
+                .getItems().stream()
+                .map(Product::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        System.out.println(total);
+
+        // TODO: 6. Find out all books written by each author
+        System.out.println("\n============= Find out all books written by each author =============");
+        products.stream()
+                .collect(Collectors.groupingBy(Product::getAuthor, Collectors.toList()))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(System.out::println);
     }
 
     private static FavoriteProduct getFavoriteProduct(Map.Entry<String, Long> stringLongEntry) {
@@ -103,28 +115,34 @@ public class StreamPractice {
     private static void init() {
         Product product = new Product();
         product.setName("Java Programming I");
-        product.setPrice(BigDecimal.valueOf(300));
-        product.setRating(9);
+        product.setPrice(BigDecimal.valueOf(700));
+        product.setAuthor("A.N.M. Bazlur Rahman");
+        product.setRating(10);
 
         Product product1 = new Product();
         product1.setName("Java Programming II");
-        product1.setPrice(BigDecimal.valueOf(700));
-        product1.setRating(10);
+        product1.setPrice(BigDecimal.valueOf(300));
+        product1.setAuthor("A.N.M. Bazlur Rahman");
+        product1.setRating(9);
 
         Product product2 = new Product();
         product2.setName("Thread Programming");
         product2.setPrice(BigDecimal.valueOf(250));
+        product2.setAuthor("A.N.M. Bazlur Rahman");
         product2.setRating(9);
 
         Product product3 = new Product();
-        product3.setName("Sun Java");
+        product3.setName("Sun Java 2");
+        product3.setAuthor("Unknown Author");
         product3.setPrice(BigDecimal.valueOf(250));
         product3.setRating(7);
+
+        products = List.of(product, product1, product2, product3);
 
         Order order1 = new Order();
         order1.setOrderId(UUID.randomUUID().toString());
 
-        order1.setItems(new HashSet<>());
+        order1.setItems(new ArrayList<>());
         order1.getItems().add(product);
 //        order1.getItems().add(product1);
 //        order1.getItems().add(product2);
@@ -132,21 +150,21 @@ public class StreamPractice {
 
         Order order2 = new Order();
         order2.setOrderId(UUID.randomUUID().toString());
-        order2.setItems(new HashSet<>());
+        order2.setItems(new ArrayList<>());
         order2.getItems().add(product3);
         order2.getItems().add(product1);
         order2.getItems().add(product);
 
         Order order3 = new Order();
         order3.setOrderId(UUID.randomUUID().toString());
-        order3.setItems(new HashSet<>());
+        order3.setItems(new ArrayList<>());
         order3.getItems().add(product2);
         order3.getItems().add(product);
         order3.getItems().add(product1);
 
         Order order4 = new Order();
         order4.setOrderId(UUID.randomUUID().toString());
-        order4.setItems(new HashSet<>());
+        order4.setItems(new ArrayList<>());
         order4.getItems().add(product3);
         order4.getItems().add(product1);
         order4.getItems().add(product2);
@@ -216,7 +234,7 @@ class Customer {
 }
 
 class Order {
-    private Set<Product> items;
+    private List<Product> items;
     private String orderId;
 
     public String getOrderId() {
@@ -227,11 +245,11 @@ class Order {
         this.orderId = orderId;
     }
 
-    public Set<Product> getItems() {
+    public List<Product> getItems() {
         return items;
     }
 
-    public void setItems(Set<Product> items) {
+    public void setItems(List<Product> items) {
         this.items = items;
     }
 
@@ -244,6 +262,15 @@ class Product {
     private String name;
     private BigDecimal price;
     private int rating;
+    private String author;
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
     public String getName() {
         return name;
