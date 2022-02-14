@@ -78,10 +78,9 @@ public class StreamPractice {
         //  A favorite product is the maximum quantity a customer ordered of a specific product
         System.out.println("\n============== Customer 1's favorite product =============");
         var productsMap = customer1Orders.stream()
-                .collect(Collectors.groupingBy(Product::getName, TreeMap::new, Collectors.counting()));
+                .collect(Collectors.groupingBy(Product::getName, Collectors.counting()));
         productsMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-//                        .forEach(System.out::println);
                 .findFirst()
                 .ifPresent(System.out::println);
 
