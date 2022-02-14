@@ -81,7 +81,9 @@ public class StreamPractice {
                 .collect(Collectors.groupingBy(Product::getName, TreeMap::new, Collectors.counting()));
         productsMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .forEach(System.out::println);
+//                        .forEach(System.out::println);
+                .findFirst()
+                .ifPresent(System.out::println);
 
         // TODO: 5. Calculate the total cost of a order for a customer (customer 1, 2nd order)
         System.out.println("\n============= Calculate the total cost of a order for a customer =============");
@@ -139,6 +141,8 @@ public class StreamPractice {
 
         order1.setItems(new ArrayList<>());
         order1.getItems().add(product);
+        order1.getItems().add(product1);
+        order1.getItems().add(product1);
         order1.getItems().add(product1);
         order1.getItems().add(product2);
         order1.getItems().add(product3);
