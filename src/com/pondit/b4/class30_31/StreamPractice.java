@@ -5,8 +5,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.mapping;
-
 // 1. Find out 3 products with maximum ratings. Sort products by (i) product ratings. If more than 1 products have same amount of ratings, (ii) sort by names
 // 2. Find out 3 products with minimum ratings. Sort products by (i) product ratings. If more than 1 products have same amount of ratings, (ii) sort by names
 // 3. Find out total orders of each specific kind of product
@@ -70,9 +68,6 @@ public class StreamPractice {
                 .flatMap(order -> order.getItems().stream()).toList();
         var customer2Orders = customer2.getOrders().stream()
                 .flatMap(order -> order.getItems().stream()).toList();
-
-//        System.out.println("\n============== Testing merged streams =============");
-//        Stream.concat(customer1Orders.stream(), customer2Orders.stream()).forEach(System.out::println);
 
         System.out.println("\n============== Find out total orders of each specific kind of product =============");
         Stream.concat(customer1Orders.stream(), customer2Orders.stream())
@@ -144,8 +139,8 @@ public class StreamPractice {
 
         order1.setItems(new ArrayList<>());
         order1.getItems().add(product);
-//        order1.getItems().add(product1);
-//        order1.getItems().add(product2);
+        order1.getItems().add(product1);
+        order1.getItems().add(product2);
         order1.getItems().add(product3);
 
         Order order2 = new Order();
