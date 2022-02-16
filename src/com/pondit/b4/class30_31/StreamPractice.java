@@ -51,6 +51,18 @@ public class StreamPractice {
                 .limit(3)
                 .forEach(System.out::println);
 
+        // Alternative approach, improved by A.N.M. Bazlur Rahman vaiya
+        customer1.getOrders()
+                .stream()
+                .map(Order::getItems)
+                .flatMap(Collection::stream)
+                .distinct()
+                .sorted(Comparator.comparing(Product::getRating)
+                        .reversed()
+                        .thenComparing(Product::getName))
+                .limit(3)
+                .forEach(System.out::println);
+
         // TODO: 2. Find out 3 products with minimum ratings.
         //  Sort products by (i) product ratings. If 2 products have same amount of ratings, sort by names
 
@@ -82,6 +94,15 @@ public class StreamPractice {
         productsMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .findFirst()
+                .ifPresent(System.out::println);
+
+        // A different approach, improved by A.N.M. Bazlur Rahman vaiya
+        customer1Orders
+                .stream()
+                .collect(Collectors.groupingBy(Product::getName, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())  // Just getting the valued maximum item
                 .ifPresent(System.out::println);
 
         // TODO: 5. Calculate the total cost of a order for a customer (customer 1, 2nd order)
