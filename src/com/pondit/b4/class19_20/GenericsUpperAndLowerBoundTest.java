@@ -1,7 +1,9 @@
 package com.pondit.b4.class19_20;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 class GenericsUpperBoundTest <T extends Daughter>{
 
@@ -11,6 +13,37 @@ class GenericsUpperBoundTest <T extends Daughter>{
         // This is an exceptional example of using wildcard in upper bound definition. This code will work.
         // We can call it definition level use case, because we defined the List and populated with value in one go
         List<? extends GrandPa> childrenOfGrandPa = List.of(new GrandPa(), new Daughter(), new GrandChild2());
+
+        List<String> stringList1 = new ArrayList<>();
+        stringList1.add("Muhammad");
+        stringList1.add("Al Fatih");
+
+        Set<? extends Apple> appleSet = new HashSet<>();
+        appleSet.add(new Apple());
+        appleSet.add(new AsianApple());
+        appleSet.add(new Fruit());
+        appleSet.add(new Object());
+
+
+        List<? super Apple> basket = List.of(new Apple(), new AsianApple(), new Fruit(), new Object());
+
+        basket.add(new Apple());    //Successful
+        basket.add(new AsianApple()); //Successful
+        basket.add(new Fruit());    //Compile time error
+        basket.add(new Object());    //Compile time error
+
+
+
+        List<AsianApple> basket2 = new ArrayList<>();
+        basket2.add(new AsianApple());
+        printApples(basket2);
+
+        List<Fruit> basket3 = new ArrayList<>();
+        basket3.add(new AsianApple());
+        basket3.add(new Apple());
+        basket3.add(new Fruit());
+        printApples(basket3);
+
 
         List<GrandPa> childrenOfGrandPa2 = new ArrayList<>();
         childrenOfGrandPa2.add(new Daughter());
@@ -26,6 +59,11 @@ class GenericsUpperBoundTest <T extends Daughter>{
 //         upperBoundTest.list.add(new GrandChild1());
 //         upperBoundTest.list.add(new GrandChild3());
 
+    }
+
+    public static void printApples(List<? super Apple> apples)
+    {
+        System.out.println(apples);
     }
 
     public void addSon(List<? extends Son> p){
@@ -54,3 +92,25 @@ class Daughter extends GrandPa {}
 class GrandChild1 extends Son {}
 class GrandChild2 extends Daughter {}
 class GrandChild3 extends Son {}
+
+
+class Fruit {
+    @Override
+    public String toString() {
+        return "Any fruit!!";
+    }
+}
+
+class Apple extends Fruit {
+    @Override
+    public String toString() {
+        return "This is an Apple !!";
+    }
+}
+
+class AsianApple extends Apple {
+    @Override
+    public String toString() {
+        return "This is an AsianApple !!";
+    }
+}
