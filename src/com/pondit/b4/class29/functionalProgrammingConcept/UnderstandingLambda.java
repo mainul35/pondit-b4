@@ -1,5 +1,7 @@
 package com.pondit.b4.class29.functionalProgrammingConcept;
 
+import java.util.function.Supplier;
+
 /**
  *
  * f(x) = 2x+3
@@ -33,4 +35,45 @@ public class UnderstandingLambda {
 @FunctionalInterface
 interface CalculateXAndYFunction {
     int f(int x, int y);
+}
+
+
+@FunctionalInterface
+interface MyFunctionalInterface {
+    void myFunction(String s);
+}
+
+class RunMyFunction {
+    public static void main(String[] args) {
+
+        // With anonymous inner class
+        var myFunc = new MyFunctionalInterface() {
+            @Override
+            public void myFunction(String s) {
+                System.out.println(s);
+            }
+        };
+
+        // With Lambda
+        MyFunctionalInterface myFunc1 = (String s) -> System.out.println(s);
+
+
+        // Lambda as first class citizen
+        runMyFunction((s) -> System.out.println(s));
+
+        // Method Reference
+        runMyFunction(System.out::println);
+
+        Supplier<String> supplier = new Supplier<String>() {
+            @Override
+            public String get() {
+                return null;
+            }
+        };
+
+    }
+
+    public static void runMyFunction (MyFunctionalInterface myFunctionalInterface) {
+        myFunctionalInterface.myFunction("Printing my function");
+    }
 }

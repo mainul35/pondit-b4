@@ -3,6 +3,8 @@ package com.pondit.b4;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *  Condition has 3 patterns
@@ -82,5 +84,62 @@ class DailyRoutine {
 //                }
 //                break;
 //        }
+    }
+}
+
+class Main {
+    static class Spoon {
+        private Diner owner;
+        public Spoon(Diner d) { owner = d; }
+        public Diner getOwner() { return owner; }
+        public synchronized void setOwner(Diner d) { owner = d; }
+        public synchronized void use() {
+            System.out.printf("%s has eaten!", owner.name);
+        }
+    }
+
+    static class Diner {
+        private String name;
+        private boolean isHungry;
+
+        public Diner(String n) { name = n; isHungry = true; }
+        public String getName() { return name; }
+        public boolean isHungry() { return isHungry; }
+
+        public void eatWith(Spoon spoon, Diner spouse) {
+            while (isHungry) {
+                if (spoon.owner != this) {
+                    try { Thread.sleep(1); }
+                    catch(InterruptedException e) { continue; }
+                    continue;
+                }
+
+                if (spouse.isHungry()) {
+                    System.out.printf("%s: You eat first my darling %s!%n",
+                            name, spouse.getName());
+                    spoon.setOwner(spouse);
+                    continue;
+                }
+
+                spoon.use();
+                isHungry = false;
+                System.out.printf("%s: I am stuffed, my darling %s!%n",
+                        name, spouse.getName());
+                spoon.setOwner(spouse);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Set<? super Number> numberSet = new HashSet<>();
+        numberSet.add(2);
+        numberSet.add(3);
+
+        final Diner husband = new Diner("Bob");
+        final Diner wife = new Diner("Alice");
+        final Spoon s = new Spoon(husband);
+        new Thread(() -> husband.eatWith(s, wife)).start();
+        new Thread(() -> wife.eatWith(s, husband)).start();
     }
 }

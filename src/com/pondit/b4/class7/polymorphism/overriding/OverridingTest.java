@@ -36,3 +36,15 @@ class ChildClass extends ParentClass {
         System.out.println("Child class run method called");
     }
 }
+
+interface A {
+    void doSomething();
+}
+
+class B implements A {
+
+    @Override
+    private void doSomething() {
+
+    }
+}

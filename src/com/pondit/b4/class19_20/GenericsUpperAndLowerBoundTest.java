@@ -18,25 +18,24 @@ class GenericsUpperBoundTest <T extends Daughter>{
         stringList1.add("Muhammad");
         stringList1.add("Al Fatih");
 
-        Set<? extends Apple> appleSet = new HashSet<>();
-        appleSet.add(new Apple());
-        appleSet.add(new AsianApple());
-        appleSet.add(new Fruit());
-        appleSet.add(new Object());
+        Set<? super Number> numberSet = new HashSet<>();
+        numberSet.add(2);
+        numberSet.add(3);
 
 
-        List<? super Apple> basket = List.of(new Apple(), new AsianApple(), new Fruit(), new Object());
+        List<? super Fruit> basket = new ArrayList<>();
+        List<? super Apple> basket1 = List.of(new Apple(), new AsianApple(), new Fruit(), new Object(), 123, 12.45);
 
-        basket.add(new Apple());    //Successful
-        basket.add(new AsianApple()); //Successful
-        basket.add(new Fruit());    //Compile time error
-        basket.add(new Object());    //Compile time error
+        basket1.add(new Apple());    //Successful
+        basket1.add(new AsianApple()); //Successful
+//        basket1.add(new Fruit());    //Compile time error
+//        basket1.add(new Object());    //Compile time error
 
 
 
         List<AsianApple> basket2 = new ArrayList<>();
         basket2.add(new AsianApple());
-        printApples(basket2);
+        printApples(basket);
 
         List<Fruit> basket3 = new ArrayList<>();
         basket3.add(new AsianApple());
