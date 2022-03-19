@@ -5,14 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-class GenericsUpperBoundTest <T extends Daughter>{
+class GenericTest {
 
-    List<T> list = new ArrayList<>();
 
     public static void main(String[] args) {
-        // This is an exceptional example of using wildcard in upper bound definition. This code will work.
-        // We can call it definition level use case, because we defined the List and populated with value in one go
-        List<? extends GrandPa> childrenOfGrandPa = List.of(new GrandPa(), new Daughter(), new GrandChild2());
 
         List<String> stringList1 = new ArrayList<>();
         stringList1.add("Muhammad");
@@ -44,53 +40,46 @@ class GenericsUpperBoundTest <T extends Daughter>{
         printApples(basket3);
 
 
-        List<GrandPa> childrenOfGrandPa2 = new ArrayList<>();
-        childrenOfGrandPa2.add(new Daughter());
-        childrenOfGrandPa2.add(new GrandChild2());
-
-        GenericsUpperBoundTest<Daughter> upperBoundTest = new GenericsUpperBoundTest<>();
-        upperBoundTest.list.add(new Daughter());
-        upperBoundTest.list.add(new GrandChild2());
-
-        // however, followings are out of upper bound reach
-//         upperBoundTest.list.add(new GrandPa());
-//         upperBoundTest.list.add(new Son());
-//         upperBoundTest.list.add(new GrandChild1());
-//         upperBoundTest.list.add(new GrandChild3());
-
     }
 
     public static void printApples(List<? super Apple> apples)
     {
         System.out.println(apples);
     }
-
-    public void addSon(List<? extends Son> p){
-        System.out.println(p);
-    }
 }
 
-class GenericsLowerBoundTest <T> {
+class TestGenericArray <T> {
+    private T[] elements; //GOOD
+    int count = 0;
+
+    public TestGenericArray() {
+//        elements = new T[10];         // ERROR, T is not a class known by the compiler
+//        elements = new Object[10];    // ERROR, elements is not an array of Object
+        elements = getArray(100);   // GOOD, but may lead to ClassCastException or ArrayStoreException in the future.
+    }
+
+    public <R> R[] getArray(int size) {
+        R[] arr = (R[]) new String[size];   // Notice that we have cast our String array to the provided type and returning it
+        return arr;
+    }
+
+    public void addElement(T t) {
+        elements[count] = t;
+        count++;
+    }
+
+    public void printElements() {
+        for (T element: elements) {
+            System.out.println(element);
+        }
+    }
 
     public static void main(String[] args) {
-        List<? super Son> list = new ArrayList<>();
-        list.add(new GrandChild1());
-        list.add(new GrandChild3());
-        list.add(new Son());
-        // followings are out of lower bound reach
-//        list.add(new GrandChild2());
-//        list.add(new GrandPa());
-//        list.add(new Daughter());
+        TestGenericArray<Integer> testGeneric = new TestGenericArray<>();   // Notice here that we have passed Integer as type.
+        testGeneric.addElement(10);         // While trying to execute this operation, we will get ArrayStoreException
+        testGeneric.printElements();
     }
-
 }
-
-class GrandPa {}
-class Son extends GrandPa {}
-class Daughter extends GrandPa {}
-class GrandChild1 extends Son {}
-class GrandChild2 extends Daughter {}
-class GrandChild3 extends Son {}
 
 
 class Fruit {
@@ -111,5 +100,50 @@ class AsianApple extends Apple {
     @Override
     public String toString() {
         return "This is an AsianApple !!";
+    }
+}
+
+
+/**
+ * Using Generic Type T for class
+ * An example of Using Generic types as parameter of a class or an interface
+ * */
+
+class ResponseEntity<T> {
+    private T t;
+
+    /**
+     * Introducing new Generic Type P for this constructor 1st parameter
+     * Using already defined generic type T from class definition in 2nd parameter
+     * An example of Using Generic types with constructor definition
+     * */
+
+    private <P> ResponseEntity (P p, T t) {
+        System.out.println(p);
+        this.t = t;
+    }
+
+    /**
+     * Introducing <IN extends Fruit> new generic type to be passed through method parameter
+     * Example of Using Generic types with method definition
+     * */
+
+    public static  <IN extends Fruit> ResponseEntity ok(IN body) {
+        var respEntity = new ResponseEntity<>("Creating Response Entity with provided type...", body);
+        respEntity.t = body;
+        System.out.println("Created container of type: "+ body.getClass());
+        return respEntity;
+    }
+
+    public T body() {
+        return this.t;
+    }
+
+    public <T extends Fruit> List<? extends Fruit> add(T... instances) {
+        List<T> fruits = new ArrayList<>();
+        for (T t: instances) {
+            fruits.add(t);
+        }
+        return fruits;
     }
 }
