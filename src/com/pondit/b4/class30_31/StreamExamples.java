@@ -5,6 +5,14 @@ import java.util.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
+/**
+* You have some dishes (food menus) given.
+* Filter them first to keep only dishes below 400 calories
+* Sort them by calories first
+* If 2 dishes have same calories, sort by name
+* Then only make an object with their calories and name and print
+*/
+
 public class StreamExamples {
 
     public static void main(String[] args) {

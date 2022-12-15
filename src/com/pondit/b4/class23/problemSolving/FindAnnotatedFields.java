@@ -13,7 +13,7 @@ public class FindAnnotatedFields {
 
     /**
      * 1. A class has 2 fields annotated with @Autowired annotation
-     * 2. We will explore the fields, create instantiate the fields
+     * 2. We will explore the fields, instantiate the fields
      * 3. We will reuse and inject the already instantiated objects (beans)
      * */
     public static void main(String[] args) throws IllegalAccessException, InvocationTargetException, InstantiationException {
