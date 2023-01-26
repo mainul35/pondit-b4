@@ -1,12 +1,17 @@
 package com.pondit.b4.concurrency.synchronizedpractice;
 
-public class MyCounter {
-    private int count = 0;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
-    public synchronized void add(int value){
+public class MyCounter {
+    private volatile int count = 0;
+
+    Logger logger = Logger.getLogger(getClass().getName());
+
+    public void add(int value){
         this.count += value;
     }
-    public synchronized void subtract(int value){
+    public void subtract(int value){
         this.count -= value;
     }
 
@@ -19,27 +24,20 @@ public class MyCounter {
         Runnable r1 = () -> {
             int i = 0;
             while (i++ < 10) {
-                myCounter.add(1);
-                System.out.println(Thread.currentThread().getName() + ", counter = "+ i+": " + myCounter.getCount());
+                synchronized (myCounter) {
+                    myCounter.add(10);
+                    System.out.println(Thread.currentThread().getName() + ", counter = "+ i+": " + myCounter.getCount());
+                }
+
             }
         };
         Runnable r2 = () -> {
             int i = 0;
             while (i++ < 10) {
-                myCounter.subtract(1);
-                System.out.println(Thread.currentThread().getName() + ", counter = "+ i+": " + myCounter.getCount());
-            }
-        };
-
-        Runnable r3 = () -> {
-            int i = 0;
-            while (i++ < 10) {
-//                synchronized (myCounter) {
-                    myCounter.add(1);
-                    System.out.println(Thread.currentThread().getName() + ", counter = "+ i+": " + myCounter.getCount());
+                synchronized (myCounter) {
                     myCounter.subtract(1);
                     System.out.println(Thread.currentThread().getName() + ", counter = "+ i+": " + myCounter.getCount());
-//                }
+                }
             }
         };
 
@@ -48,9 +46,44 @@ public class MyCounter {
 //        var t2 = new Thread(r2);
 //        t2.start();
 
-        var t3 = new Thread(r3);
-        t3.start();
-        var t4 = new Thread(r3);
-        t4.start();
+        Runnable r3 = () -> {
+            System.out.println("=================== Without Synchronization or Atomic ===================");
+            int i = 0;
+            while (i++ < 10) {
+                myCounter.add(1);
+                System.out.println(Thread.currentThread().getName() + ", Not Synchronized, counter = "+ i+": " + myCounter.getCount());
+//                myCounter.subtract(1);
+//                System.out.println(Thread.currentThread().getName() + ", counter = "+ i+": " + myCounter.getCount());
+            }
+        };
+
+        new Thread(r3).start();
+
+        Runnable r4 = () -> {
+            System.out.println("=================== With Synchronization ===================");
+            int i = 0;
+            while (i++ < 10) {
+                synchronized (myCounter) {
+                    myCounter.add(1);
+                    System.out.println(Thread.currentThread().getName() + ", synchronized, counter = "+ i+": " + myCounter.getCount());
+//                    myCounter.subtract(1);
+//                    System.out.println(Thread.currentThread().getName() + ", counter = "+ i+": " + myCounter.getCount());
+                }
+            }
+        };
+        new Thread(r4).start();
+
+        Runnable r5 = () -> {
+            System.out.println("=================== With Atomic ===================");
+            int i = 0;
+            AtomicReference<MyCounter> myCounterAtomicReference = new AtomicReference<>(myCounter);
+            while (i++ < 10) {
+                myCounterAtomicReference.get().add(1);
+                System.out.println(Thread.currentThread().getName() + ", atomic, counter = "+ i+": " +  myCounterAtomicReference.get().getCount());
+//                myCounterAtomicReference.get().subtract(1);
+//                System.out.println(Thread.currentThread().getName() + ", counter = "+ i+": " + myCounterAtomicReference.get().getCount());
+            }
+        };
+        new Thread(r5).start();
     }
 }
