@@ -89,7 +89,7 @@ class TestGenericArray <T> {
     }
 
     public <R> R[] getArray(int size) {
-        R[] arr = (R[]) new String[size];   // Notice that we have cast our String array to the provided type and returning it
+        R[] arr = (R[]) new Integer[size];   // Notice that we have cast our String array to the provided type and returning it
         return arr;
     }
 

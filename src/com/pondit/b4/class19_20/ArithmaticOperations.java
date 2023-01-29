@@ -1,34 +1,43 @@
 package com.pondit.b4.class19_20;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.BiFunction;
 
-public class ArithmaticOperations<FIRST, SECOND> {
-    private FIRST first;
-    private SECOND second;
-
-    public ArithmaticOperations() {
-        this.first = first;
-        this.second = second;
-    }
-
-    public void print(SECOND second) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+public interface ArithmaticOperations<IN1, IN2, RETURN> {
+    default void print(IN2 second) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         var clazz = second.getClass();
         var name = clazz.getMethod("getName").invoke(second);
         var age = clazz.getMethod("getAge").invoke(second);
         System.out.println(name);
         System.out.println(age);
     }
+
+    RETURN add(IN1 f, IN2 s);
 }
 
 class TestArithmatic {
     public static void main(String[] args) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        ArithmaticOperations<Integer, Person> operations = new ArithmaticOperations<>();
+//        ArithmaticOperations<Integer, Person> operations = new ArithmaticOperations<>();
+//
+//        Person person = new Person();
+//        person.setAge(10);
+//        person.setName("asdf");
+//
+//        operations.print(person);
 
-        Person person = new Person();
-        person.setAge(10);
-        person.setName("asdf");
+        BiFunction<Integer, Integer, Integer> biFunction = (Integer t, Integer u) -> t + u;
 
-        operations.print(person);
+        biFunction.apply(19, 20);
+
+        ArithmaticOperations<Integer, Double, Double> operations = new ArithmaticOperations<Integer, Double, Double>() {
+            @Override
+            public Double add(Integer f, Double s) {
+                return f + s;
+            }
+        };
+
+        ArithmaticOperations<Integer, Double, Double> operations1 = (f, s) -> f + s;
+        System.out.println(operations1.add(10, 20.4));
     }
 }
 
