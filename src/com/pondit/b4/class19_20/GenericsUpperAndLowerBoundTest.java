@@ -18,28 +18,58 @@ class GenericTest {
         numberSet.add(2);
         numberSet.add(3);
 
+        Set<? extends Number> numList = Set.of(3, 100_000_000_000_000L, 2.5F, 2.7);
 
-        List<? super Fruit> basket = new ArrayList<>();
+
+        /**
+         * The following code is mysterious.
+         * When we define a field or a local variable of <code>List<? super Apple></code>, like we can see below,
+         * we will not be able to add the parent type instances,
+         * instead we will only be able to add the child type instances.
+         */
+        List<? super Apple> bb = new ArrayList<>();
+        bb.add(new Apple());
+        bb.add(new AsianApple());
+//        bb.add(new Fruit());    //Compile time error
+//        bb.add(new Object());    //Compile time error
+
+        /**
+         * The following codes from line 41 to 45 will work correctly.
+         * This is because when we use <code>List<? super Apple></code> in a method parameter,
+         * We can pass all the super typed instances and anything child to that super type in the method param.
+         */
+        List<Fruit> b = new ArrayList<>();
+        b.add(new Fruit());
+        b.add(new AsianApple());
+        b.add(new Apple());
+        printApples(b);
+
+        /**
+         * The following codes from line 52 to 53 will work correctly.
+         * This is because when we use immutable list to assign in a local or instance variable,
+         * We can pass all the super typed instances and anything child to that super type in the method param
+         */
+        List<? super Apple> b2 = List.of(new Fruit(), new Apple(), new AsianApple());
+        printApples(b2);
+
+        /**
+         * The following 2 lines will give runtime error due to Immutable Collection.
+         * Use <code>new ArrayList()</code> instead of <code>List.of(...)</code>
+         */
         List<? super Apple> basket1 = List.of(new Apple(), new AsianApple(), new Fruit(), new Object(), 123, 12.45);
-
-        basket1.add(new Apple());    //Successful
-        basket1.add(new AsianApple()); //Successful
-//        basket1.add(new Fruit());    //Compile time error
-//        basket1.add(new Object());    //Compile time error
+        basket1.add(new Apple());
+        basket1.add(new AsianApple());
 
 
 
         List<AsianApple> basket2 = new ArrayList<>();
         basket2.add(new AsianApple());
-        printApples(basket);
 
         List<Fruit> basket3 = new ArrayList<>();
         basket3.add(new AsianApple());
         basket3.add(new Apple());
         basket3.add(new Fruit());
         printApples(basket3);
-
-
     }
 
     public static void printApples(List<? super Apple> apples)
@@ -59,7 +89,7 @@ class TestGenericArray <T> {
     }
 
     public <R> R[] getArray(int size) {
-        R[] arr = (R[]) new String[size];   // Notice that we have cast our String array to the provided type and returning it
+        R[] arr = (R[]) new Integer[size];   // Notice that we have cast our String array to the provided type and returning it
         return arr;
     }
 
