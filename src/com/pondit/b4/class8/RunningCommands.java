@@ -12,24 +12,27 @@ public class RunningCommands {
         if (System.getProperty("os.name").equalsIgnoreCase("linux") || System.getProperty("os.name").equalsIgnoreCase("mac") ) {
             runWithPrivileges();
             // TODO: Pull ubuntu docker image
-//            runUbuntuDockerImage();
+            runUbuntuDockerImage();
             // TODO: Create ubuntu container
             // TODO: exec -it inside docker container
-        }
-
-        while ((line = br.readLine()) != null && !line.isBlank()) {
-            if (line.contains("powershell") || line.contains("cmd")) {
-                System.err.println("\nUnable to execute command: " + line);
-                System.out.println(">> ");
-                continue;
-            }
-            if (System.getProperty("os.name").equalsIgnoreCase("linux") || System.getProperty("os.name").equalsIgnoreCase("mac") ) {
-                pb.command("/bin/bash", "-c", line);
-            } else {
-                pb.command("powershell.exe", "/c", line);
-            }
+        } else {
+            pb.command("powershell.exe", "/c", "docker run -it ubuntu bash");
             executeCommand(pb);
         }
+
+//        while ((line = br.readLine()) != null && !line.isBlank()) {
+//            if (line.contains("powershell") || line.contains("cmd")) {
+//                System.err.println("\nUnable to execute command: " + line);
+//                System.out.println(">> ");
+//                continue;
+//            }
+//            if (System.getProperty("os.name").equalsIgnoreCase("linux") || System.getProperty("os.name").equalsIgnoreCase("mac") ) {
+//                pb.command("/bin/bash", "-c", line);
+//            } else {
+//                pb.command("powershell.exe", "/c", line);
+//            }
+//            executeCommand(pb);
+//        }
     }
 
     private static void executeCommand(ProcessBuilder pb) throws IOException, InterruptedException {
@@ -58,7 +61,8 @@ public class RunningCommands {
     }
 
     private static void runUbuntuDockerImage() throws IOException, InterruptedException {
-        var pb = new ProcessBuilder("/bin/bash", "-c", "sudo docker run -it ubuntu:latest");
+        var pb = new ProcessBuilder();
+        pb.command("/bin/bash", "-c", "docker run hello-world");
         executeCommand(pb);
     }
 

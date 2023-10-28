@@ -26,7 +26,7 @@ public class CodingTest {
         }
     }
 
-    BufferedReader br = new BufferedReader("input.dat");
+//    BufferedReader br = new BufferedReader("input.dat");
 
 }
 
@@ -44,8 +44,8 @@ class B extends A{
         System.out.println();
     }
 
-    void a() {
-        super();
-        this();
-    }
+//    void a() {
+//        super();
+//        this();
+//    }
 }

@@ -1,14 +1,16 @@
 package com.pondit.b4.crypto;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.lingala.zip4j.exception.ZipException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EncToolUI extends JFrame {
 
-    private static final Logger logger = LoggerFactory.getLogger(EncToolUI.class);
+    private static final Logger logger = Logger.getLogger("com.pondit.b4.crypto.EncToolUI");
 
     /**
      * Every implementation of the Java platform is required to support the following standard Cipher transformations with the keysizes in parentheses:
@@ -65,14 +67,14 @@ public class EncToolUI extends JFrame {
         pnlCenter.setLayout(new GridLayout(3, 1));
         var pnlRow1 = new JPanel(new GridLayout(3, 1));
         pnlRow1.add(new Label(" "));
-        var cmbEncSelector = new JComboBox<>(encryptionCypherItems);
-        cmbEncSelector.addActionListener( e -> {
-            var obj = (JComboBox)e.getSource();
-            logger.debug(String.valueOf(obj.getSelectedItem()));
-            System.out.println(String.valueOf(obj.getSelectedItem()));
-            encToolUIDto.setEncryptionOption(String.valueOf(obj.getSelectedItem()));
-        });
-        pnlRow1.add(cmbEncSelector);
+//        var cmbEncSelector = new JComboBox<>(encryptionCypherItems);
+//        cmbEncSelector.addActionListener( e -> {
+//            var obj = (JComboBox)e.getSource();
+//            logger.log(Level.INFO, String.valueOf(obj.getSelectedItem()));
+//            System.out.println(String.valueOf(obj.getSelectedItem()));
+//            encToolUIDto.setEncryptionOption(String.valueOf(obj.getSelectedItem()));
+//        });
+//        pnlRow1.add(cmbEncSelector);
         pnlRow1.add(new Label(" "));
         pnlCenter.add(pnlRow1);
 
@@ -86,7 +88,7 @@ public class EncToolUI extends JFrame {
             fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             var returnVal = fileChooser.showOpenDialog(pnlRow2);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                logger.debug("File selected: " + fileChooser.getSelectedFile().getAbsolutePath());
+                logger.log(Level.INFO, "File selected: " + fileChooser.getSelectedFile().getAbsolutePath());
                 lblSelectedFile.setText(fileChooser.getSelectedFile().getAbsolutePath());
                 encToolUIDto.setInputFilePath(fileChooser.getSelectedFile().getAbsolutePath());
             }
@@ -115,18 +117,18 @@ public class EncToolUI extends JFrame {
                 JOptionPane.showMessageDialog(encToolUI, "No Key Phrase Provided!");
             }
 
-            if (encToolUIDto.getEncryptionOption().isEmpty()) {
-                JOptionPane.showMessageDialog(encToolUI, "No Encryption Option Provided!");
-            }
+//            if (encToolUIDto.getEncryptionOption().isEmpty()) {
+//                JOptionPane.showMessageDialog(encToolUI, "No Encryption Option Provided!");
+//            }
 
             if (encToolUIDto.getInputFilePath().isEmpty()) {
                 JOptionPane.showMessageDialog(encToolUI, "No File Selected!");
             }
 
-            if (!encToolUIDto.getKeyPhrase().isEmpty() && !encToolUIDto.getEncryptionOption().isEmpty() && !encToolUIDto.getInputFilePath().isEmpty()) {
+            if (!encToolUIDto.getKeyPhrase().isEmpty() && !encToolUIDto.getInputFilePath().isEmpty()) {
                 try {
                     cryptoService.encrypt(encToolUIDto);
-                } catch (CryptoException ex) {
+                } catch (CryptoException | IOException ex) {
                     throw new RuntimeException(ex);
                 }
             }
