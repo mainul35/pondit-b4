@@ -1,10 +1,11 @@
 package com.pondit.b4.crypto;
 
-import net.lingala.zip4j.exception.ZipException;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,48 +13,10 @@ public class EncToolUI extends JFrame {
 
     private static final Logger logger = Logger.getLogger("com.pondit.b4.crypto.EncToolUI");
 
-    /**
-     * Every implementation of the Java platform is required to support the following standard Cipher transformations with the keysizes in parentheses:
-     * AES/CBC/NoPadding (128)
-     * AES/CBC/PKCS5Padding (128)
-     * AES/ECB/NoPadding (128)
-     * AES/ECB/PKCS5Padding (128)
-     * DES/CBC/NoPadding (56)
-     * DES/CBC/PKCS5Padding (56)
-     * DES/ECB/NoPadding (56)
-     * DES/ECB/PKCS5Padding (56)
-     * DESede/CBC/NoPadding (168)
-     * DESede/CBC/PKCS5Padding (168)
-     * DESede/ECB/NoPadding (168)
-     * DESede/ECB/PKCS5Padding (168)
-     * RSA/ECB/PKCS1Padding (1024, 2048)
-     * RSA/ECB/OAEPWithSHA-1AndMGF1Padding (1024, 2048)
-     * RSA/ECB/OAEPWithSHA-256AndMGF1Padding (1024, 2048)
-     *
-     * Usage: Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
-     * */
-    private static String encryptionCypherItems[] = {
-            "AES/CBC/NoPadding",
-            "AES/CBC/PKCS5Padding",
-            "AES/ECB/NoPadding",
-            "AES/ECB/PKCS5Padding",
-            "DES/CBC/NoPadding",
-            "DES/CBC/PKCS5Padding",
-            "DES/ECB/NoPadding",
-            "DES/ECB/PKCS5Padding",
-            "DESede/CBC/NoPadding",
-            "DESede/CBC/PKCS5Padding",
-            "DESede/ECB/NoPadding",
-            "DESede/ECB/PKCS5Padding",
-            "RSA/ECB/PKCS1Padding",
-            "RSA/ECB/OAEPWithSHA-1AndMGF1Padding",
-            "RSA/ECB/OAEPWithSHA-256AndMGF1Padding"
-    };
-
     public static void main(String[] args) {
 
         EncToolUI encToolUI = new EncToolUI();
-        EncToolUIDto encToolUIDto = new EncToolUIDto();
+        AtomicReference<EncToolUIDto> encToolUIDto = new AtomicReference<>(new EncToolUIDto());
         encToolUI.setSize(400, 300);
         encToolUI.setDefaultCloseOperation(EXIT_ON_CLOSE);
         var pnlMain = new JPanel();
@@ -65,18 +28,6 @@ public class EncToolUI extends JFrame {
 
         var pnlCenter = new JPanel();
         pnlCenter.setLayout(new GridLayout(3, 1));
-        var pnlRow1 = new JPanel(new GridLayout(3, 1));
-        pnlRow1.add(new Label(" "));
-//        var cmbEncSelector = new JComboBox<>(encryptionCypherItems);
-//        cmbEncSelector.addActionListener( e -> {
-//            var obj = (JComboBox)e.getSource();
-//            logger.log(Level.INFO, String.valueOf(obj.getSelectedItem()));
-//            System.out.println(String.valueOf(obj.getSelectedItem()));
-//            encToolUIDto.setEncryptionOption(String.valueOf(obj.getSelectedItem()));
-//        });
-//        pnlRow1.add(cmbEncSelector);
-        pnlRow1.add(new Label(" "));
-        pnlCenter.add(pnlRow1);
 
         var pnlRow2 = new JPanel(new GridLayout(3, 1));
         pnlRow2.add(new Label(" "));
@@ -90,7 +41,7 @@ public class EncToolUI extends JFrame {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 logger.log(Level.INFO, "File selected: " + fileChooser.getSelectedFile().getAbsolutePath());
                 lblSelectedFile.setText(fileChooser.getSelectedFile().getAbsolutePath());
-                encToolUIDto.setInputFilePath(fileChooser.getSelectedFile().getAbsolutePath());
+                encToolUIDto.get().setInputFilePath(fileChooser.getSelectedFile().getAbsolutePath());
             }
         });
         var pnlRow2Center = new JPanel(new GridLayout(1, 2));
@@ -100,43 +51,38 @@ public class EncToolUI extends JFrame {
         pnlRow2.add(new Label(" "));
         pnlCenter.add(pnlRow2);
 
-        var pnlRow3 = new JPanel(new GridLayout(3, 1));
-        pnlRow3.add(new Label(" "));
+        var pnlRow3 = new JPanel(new GridLayout(1, 3));
         var btnEncrypt = new JButton("Encrypt");
 
         CryptoService cryptoService = new CryptoService();
 
         btnEncrypt.addActionListener(e -> {
-            String keyPhrase = JOptionPane.showInputDialog(encToolUI, "Please enter key phrase");
-            if (keyPhrase != null) {
-                System.out.println(keyPhrase);
-                encToolUIDto.setKeyPhrase(keyPhrase);
-            }
+            encToolUIDto.set(validateInputsAndProduceDataObject(encToolUI, encToolUIDto.get()));
 
-            if (encToolUIDto.getKeyPhrase().isEmpty()) {
-                JOptionPane.showMessageDialog(encToolUI, "No Key Phrase Provided!");
-            }
-
-//            if (encToolUIDto.getEncryptionOption().isEmpty()) {
-//                JOptionPane.showMessageDialog(encToolUI, "No Encryption Option Provided!");
-//            }
-
-            if (encToolUIDto.getInputFilePath().isEmpty()) {
-                JOptionPane.showMessageDialog(encToolUI, "No File Selected!");
-            }
-
-            if (!encToolUIDto.getKeyPhrase().isEmpty() && !encToolUIDto.getInputFilePath().isEmpty()) {
+            if (!encToolUIDto.get().getKeyPhrase().isEmpty() && !encToolUIDto.get().getInputFilePath().isEmpty()) {
                 try {
-                    cryptoService.encrypt(encToolUIDto);
+                    cryptoService.encrypt(encToolUIDto.get());
                 } catch (CryptoException | IOException ex) {
                     throw new RuntimeException(ex);
                 }
             }
-
-
         });
         pnlRow3.add(btnEncrypt);
-        pnlRow3.add(new Label(" "));
+        pnlRow3.add(new Label("      "));
+
+        var btnDecrypt = new JButton("Decrypt");
+        pnlRow3.add(btnDecrypt);
+        btnDecrypt.addActionListener(e -> {
+            encToolUIDto.set(validateInputsAndProduceDataObject(encToolUI, encToolUIDto.get()));
+
+            if (!encToolUIDto.get().getKeyPhrase().isEmpty() && !encToolUIDto.get().getInputFilePath().isEmpty()) {
+                try {
+                    cryptoService.decrypt(encToolUIDto.get());
+                } catch (CryptoException | IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
         pnlCenter.add(pnlRow3);
 
         pnlMain.add(pnlTop, BorderLayout.NORTH);
@@ -144,5 +90,18 @@ public class EncToolUI extends JFrame {
         encToolUI.add(pnlMain);
         encToolUI.setVisible(true);
 
+    }
+
+    private static EncToolUIDto validateInputsAndProduceDataObject(EncToolUI encToolUI, final EncToolUIDto encToolUIDto) {
+        String keyPhrase = JOptionPane.showInputDialog(encToolUI, "Please enter key phrase");
+        if (keyPhrase != null) {
+            System.out.println(keyPhrase);
+            encToolUIDto.setKeyPhrase(keyPhrase);
+        }
+
+        if (encToolUIDto.getKeyPhrase().isEmpty()) {
+            JOptionPane.showMessageDialog(encToolUI, "No Key Phrase Provided!");
+        }
+        return encToolUIDto;
     }
 }

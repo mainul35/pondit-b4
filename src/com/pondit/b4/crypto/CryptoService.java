@@ -1,7 +1,6 @@
 package com.pondit.b4.crypto;
 
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
 
@@ -9,6 +8,7 @@ import javax.crypto.Cipher;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,33 +24,49 @@ public class CryptoService {
         doCrypto(Cipher.DECRYPT_MODE, encToolUIDto);
     }
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-
     private void doCrypto(int cipherMode, EncToolUIDto encToolUIDto) throws IOException {
-        ZipParameters zipParameters = new ZipParameters();
-        zipParameters.setEncryptFiles(true);
-        zipParameters.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD_VARIANT_STRONG);
+        var delim = "/";
 
-        List<File> filesToAdd = new ArrayList<File>();
-        var fileOrFolder = new File(encToolUIDto.getInputFilePath());
-        if (fileOrFolder.isDirectory()) {
-            for (File file : Objects.requireNonNull(fileOrFolder.listFiles())) {
-                System.out.println(ANSI_BLUE + file.getAbsolutePath() + ANSI_RESET);
-                System.out.println(ANSI_RED + file.getCanonicalPath() + ANSI_RESET);
-                System.out.println(ANSI_GREEN + file.getPath() + ANSI_RESET);
+        var folderName = encToolUIDto.getInputFilePath().split(delim)[encToolUIDto.getInputFilePath().split(delim).length - 1];
+
+        if (cipherMode == Cipher.ENCRYPT_MODE) {
+            ZipParameters zipParameters = new ZipParameters();
+            zipParameters.setEncryptFiles(true);
+            zipParameters.setEncryptionMethod(EncryptionMethod.AES);
+
+            List<File> filesToAdd = new ArrayList<File>();
+            var fileOrFolder = new File(encToolUIDto.getInputFilePath());
+            if (fileOrFolder.isDirectory()) {
+                // TODO: Implement recursive files adding strategy
+//                populateFilesToAddFromDirectory(filesToAdd, fileOrFolder);
+                Collections.addAll(filesToAdd, fileOrFolder.listFiles());
+            } else if (fileOrFolder.isFile()){
+                filesToAdd.add(Objects.requireNonNull(fileOrFolder));
+            } else {
+                throw new RuntimeException("File not found");
             }
+            ZipFile zipFile = new ZipFile(folderName + ".zip", encToolUIDto.getKeyPhrase().toCharArray());
+            zipFile.addFiles(filesToAdd, zipParameters);
+//            int splitLength = 1024 * 1024 * 1024; //10MB
+//            zipFile.createSplitZipFileFromFolder(new File(encToolUIDto.getInputFilePath()), zipParameters, true, splitLength);
         }
 
+        if (cipherMode == Cipher.DECRYPT_MODE) {
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                delim = "\\\\";
+            }
+            folderName = encToolUIDto.getInputFilePath().split(delim)[encToolUIDto.getInputFilePath().split(delim).length - 1];
 
-//        ZipFile zipFile = new ZipFile("compressed.zip", "password".toCharArray());
-//        zipFile.addFiles(filesToAdd, zipParameters);
+            if (folderName.contains(".zip")) {
+                folderName = folderName.split(".zip")[0];
+            }
+            var zipFile = new ZipFile(encToolUIDto.getInputFilePath(), encToolUIDto.getKeyPhrase().toCharArray());
+
+            zipFile.extractAll(System.getProperty("user.home")+"/Documents/"+folderName);
+        }
+    }
+
+    private void populateFilesToAddFromDirectory(List<File> filesToAdd, File fileOrFolder) {
+        // TODO: Implement recursive folder traverse and add functionality
     }
 }
